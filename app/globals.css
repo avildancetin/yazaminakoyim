@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* VT323 Font - Pixelated retro font */
+@font-face {
+  font-family: 'VT323';
+  src: url('/fonts/VT323-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  /* Force pixelated rendering */
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+}
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 17, 24, 39;
+  --background-end-rgb: 17, 24, 39;
+}
+
+body {
+  color: #3D3D2A;
+  /* Vintage green/yellow background image */
+  background-color: #c4d5df; /* Fallback color */
+  background-image: url('/background.jpg');
+  background-size: 100% auto; /* Full width, maintain aspect ratio */
+  background-position: top center;
+  background-repeat: repeat-y; /* Repeat vertically (continuous) */
+  background-attachment: fixed;
+  min-height: 100vh;
+  font-family: 'VT323', Arial, sans-serif;
+  font-size: 14px; /* Base font size - keeps block sizes consistent */
+  /* Aggressive pixelated font rendering */
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: unset !important;
+  font-smooth: never !important;
+  text-rendering: optimizeSpeed !important;
+  image-rendering: pixelated !important;
+  image-rendering: -moz-crisp-edges !important;
+  image-rendering: crisp-edges !important;
+  /* Force pixelated rendering */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Ensure html element also has the background */
+html {
+  min-height: 100vh;
+  background-color: #c4d5df;
+  background-image: url('/background.jpg');
+  background-size: 100% auto; /* Full width, maintain aspect ratio */
+  background-position: top center;
+  background-repeat: repeat-y; /* Repeat vertically (continuous) */
+  background-attachment: fixed;
+  font-family: 'VT323', Arial, sans-serif;
+  font-size: 14px; /* Base font size - keeps block sizes consistent */
+}
+
+/* Global font family and rendering - but NOT font size */
+* {
+  font-family: 'VT323', Arial, sans-serif;
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: unset !important;
+  font-smooth: never !important;
+  text-rendering: optimizeSpeed !important;
+  /* Force pixelated rendering */
+  image-rendering: pixelated !important;
+  image-rendering: -moz-crisp-edges !important;
+  image-rendering: crisp-edges !important;
+}
+
+/* Force pixelated text rendering on all elements */
+*,
+*::before,
+*::after {
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: unset !important;
+  font-smooth: never !important;
+  text-rendering: optimizeSpeed !important;
+}
+
+/* Additional pixelated rendering for text - WITH LARGER FONT SIZE */
+p, span, h1, h2, h3, h4, h5, h6, a, button, input, textarea, label, li, td, th {
+  font-size: 15px !important; /* 90% of 17px - larger text size */
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: unset !important;
+  font-smooth: never !important;
+  text-rendering: optimizeSpeed !important;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
