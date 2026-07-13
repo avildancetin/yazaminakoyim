@@ -23,7 +23,7 @@ export default async function LoginPage() {
       }}
     >
       <div className="w-full max-w-md">
-        <h1 className="text-4xl font-bold mb-8 text-center" style={{ color: '#894f69', fontSize: '54px' }}>yazamınakoyim</h1>
+        <h1 className="text-4xl font-bold mb-8 text-center" style={{ color: '#894f69', fontSize: 'clamp(28px, 8vw, 54px)' }}>yazamınakoyim</h1>
         <LoginForm />
       </div>
     </div>
