@@ -1,6 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
-import Link from 'next/link'
-import MarkAsReadButton from './MarkAsReadButton'
+import NotificationItem from './NotificationItem'
+
+function truncateSnippet(text: string, max = 80) {
+  const clean = text.trim()
+  if (clean.length <= max) return clean
+  return clean.slice(0, max).trimEnd() + '…'
+}
 
 export default async function Notifications() {
   const supabase = await createClient()
@@ -20,7 +25,9 @@ export default async function Notifications() {
         username,
         email,
         avatar_url
-      )
+      ),
+      comment:comment_id ( content ),
+      post:target_id ( content )
     `)
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
@@ -49,7 +56,6 @@ export default async function Notifications() {
         if (!actor) return null
 
         const actorName = actor.username || actor.email.split('@')[0]
-        const isRead = notification.read
 
         let message = ''
         switch (notification.type) {
@@ -61,6 +67,9 @@ export default async function Notifications() {
             break
           case 'reply':
             message = `${actorName} replied to your comment`
+            break
+          case 'reply_to_post':
+            message = `${actorName} replied to a comment under your post`
             break
           case 'tag':
             // Check if it's a comment tag or post tag
@@ -79,56 +88,38 @@ export default async function Notifications() {
         if (notification.type === 'follow') {
           // Navigate to the follower's profile
           notificationLink = `/profile/${encodeURIComponent(actorName)}`
-        } else if (notification.type === 'comment' || notification.type === 'reply' || notification.type === 'tag') {
+        } else if (
+          notification.type === 'comment' ||
+          notification.type === 'reply' ||
+          notification.type === 'reply_to_post' ||
+          notification.type === 'tag'
+        ) {
           // Navigate to the post (comments are shown on the post page)
           if (notification.target_id) {
             notificationLink = `/post/${notification.target_id}`
           }
         }
 
+        const rawSnippet =
+          notification.type === 'tag' && !notification.comment_id
+            ? notification.post?.content
+            : notification.comment?.content
+        const snippet = rawSnippet ? truncateSnippet(rawSnippet) : null
+
         return (
-          <Link
+          <NotificationItem
             key={notification.id}
+            id={notification.id}
             href={notificationLink}
-            className={`block p-4 border transition hover:opacity-90 ${
-              isRead
-                ? 'border-black'
-                : 'border-black'
-            }`}
-            style={{ 
-              backgroundColor: isRead ? '#c4d5df' : 'rgba(196, 213, 223, 0.8)' 
-            }}
-          >
-            <div className="flex items-start gap-3">
-              {actor.avatar_url ? (
-                <img
-                  src={actor.avatar_url}
-                  alt={actorName}
-                  className="w-10 h-10 object-cover border border-black"
-                />
-              ) : (
-                <div className="w-10 h-10 flex items-center justify-center text-sm font-semibold text-white border border-black" style={{ backgroundColor: '#894f69' }}>
-                  {actorName.charAt(0).toUpperCase()}
-                </div>
-              )}
-              <div className="flex-1">
-                <p className={`${isRead ? 'text-gray-700' : 'text-gray-900 font-medium'}`}>
-                  {message}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {new Date(notification.created_at).toLocaleString()}
-                </p>
-              </div>
-              {!isRead && (
-                <div className="flex-shrink-0">
-                  <MarkAsReadButton notificationId={notification.id} />
-                </div>
-              )}
-            </div>
-          </Link>
+            isRead={notification.read}
+            actorName={actorName}
+            avatarUrl={actor.avatar_url}
+            message={message}
+            snippet={snippet}
+            createdAt={notification.created_at}
+          />
         )
       })}
     </div>
   )
 }
-

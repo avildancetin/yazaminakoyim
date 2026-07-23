@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import SuppressSourceMapErrors from '@/components/SuppressSourceMapErrors'
-import FeedbackFloatingButton from '@/components/FeedbackFloatingButton'
 
 export const metadata: Metadata = {
   title: 'yazamınakoyim',
@@ -78,7 +77,6 @@ export default function RootLayout({
           }}
         />
         <SuppressSourceMapErrors />
-        <FeedbackFloatingButton />
         {children}
       </body>
     </html>

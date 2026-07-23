@@ -7,6 +7,7 @@ import { deleteCommentAction } from '@/app/api/comments/actions'
 import PostContent from './PostContent'
 import { Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { formatDateTime } from '@/utils/formatDateTime'
 
 interface Comment {
   id: string
@@ -150,7 +151,7 @@ export default function CommentsList({ postId, currentUserId }: CommentsListProp
                 {comment.profiles.username || comment.profiles.email.split('@')[0]}
               </Link>
               <span className="text-xs text-gray-500">
-                {new Date(comment.created_at).toLocaleString()}
+                {formatDateTime(comment.created_at)}
               </span>
               {isOwner && (
                 <button
@@ -176,7 +177,7 @@ export default function CommentsList({ postId, currentUserId }: CommentsListProp
 
             {isExpanded && hasReplies && (
               <div className="mt-2">
-                {comment.replies!.map(reply => renderComment(reply, depth + 1))}
+                {comment.replies!.map(reply => renderComment(reply, Math.min(depth + 1, 1)))}
               </div>
             )}
 

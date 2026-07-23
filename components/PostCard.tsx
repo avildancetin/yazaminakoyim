@@ -4,7 +4,9 @@ import DeletePostButton from './DeletePostButton'
 import DraftActions from './DraftActions'
 import PostContent from './PostContent'
 import CopyPostLinkButton from './CopyPostLinkButton'
+import SharePostButton from './SharePostButton'
 import Link from 'next/link'
+import { formatDateTime } from '@/utils/formatDateTime'
 
 interface Post {
   id: string
@@ -55,19 +57,20 @@ export default function PostCard({ post, currentUserId, isFollowing = false, sho
               {post.profiles.username || post.profiles.email.split('@')[0]}
             </p>
             <p className="text-xs text-gray-500">
-              {new Date(post.created_at).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+              {formatDateTime(post.created_at)}
             </p>
           </div>
         </Link>
         <div className="flex items-center gap-2">
           {!isDraft && (
-            <CopyPostLinkButton postId={post.id} />
+            <>
+              <SharePostButton
+                postId={post.id}
+                content={post.content}
+                hasMedia={post.media_type === 'image' && !!post.media_url}
+              />
+              <CopyPostLinkButton postId={post.id} />
+            </>
           )}
           {isDraft && isOwnPost ? (
             <DraftActions draft={post} />
