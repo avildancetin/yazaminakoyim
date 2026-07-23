@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Notifications from '@/components/Notifications'
+import PushNotificationToggle from '@/components/PushNotificationToggle'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +16,7 @@ export default async function NotificationsPage() {
   return (
     <div className="border border-black shadow-lg p-6" style={{ backgroundColor: '#c4d5df' }}>
       <h1 className="text-2xl font-bold mb-6 text-gray-900">Notifications</h1>
+      <PushNotificationToggle />
       <Notifications />
     </div>
   )

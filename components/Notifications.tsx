@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import NotificationItem from './NotificationItem'
+import { getNotificationMessage, getNotificationLink } from '@/utils/notificationMessage'
 
 function truncateSnippet(text: string, max = 80) {
   const clean = text.trim()
@@ -57,48 +58,8 @@ export default async function Notifications() {
 
         const actorName = actor.username || actor.email.split('@')[0]
 
-        let message = ''
-        switch (notification.type) {
-          case 'follow':
-            message = `${actorName} started following you`
-            break
-          case 'comment':
-            message = `${actorName} commented on your post`
-            break
-          case 'reply':
-            message = `${actorName} replied to your comment`
-            break
-          case 'reply_to_post':
-            message = `${actorName} replied to a comment under your post`
-            break
-          case 'tag':
-            // Check if it's a comment tag or post tag
-            if (notification.comment_id) {
-              message = `${actorName} tagged you in a comment`
-            } else {
-              message = `${actorName} tagged you in a post`
-            }
-            break
-          default:
-            message = `${actorName} interacted with your content`
-        }
-
-        // Determine the link based on notification type
-        let notificationLink = '#'
-        if (notification.type === 'follow') {
-          // Navigate to the follower's profile
-          notificationLink = `/profile/${encodeURIComponent(actorName)}`
-        } else if (
-          notification.type === 'comment' ||
-          notification.type === 'reply' ||
-          notification.type === 'reply_to_post' ||
-          notification.type === 'tag'
-        ) {
-          // Navigate to the post (comments are shown on the post page)
-          if (notification.target_id) {
-            notificationLink = `/post/${notification.target_id}`
-          }
-        }
+        const message = getNotificationMessage(notification.type, actorName, !!notification.comment_id)
+        const notificationLink = getNotificationLink(notification, actorName)
 
         const rawSnippet =
           notification.type === 'tag' && !notification.comment_id
