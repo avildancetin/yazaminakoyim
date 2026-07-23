@@ -11,6 +11,7 @@ import ProfileContent from '@/components/ProfileContent'
 import UpdateLastSeen from '@/components/UpdateLastSeen'
 import { formatLastSeen } from '@/utils/formatLastSeen'
 import { parseMentions } from '@/utils/parseMentions'
+import { POST_SELECT_WITH_QUOTE, attachQuotedPostProfiles } from '@/utils/postSelect'
 
 export const dynamic = 'force-dynamic'
 
@@ -59,7 +60,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   // Only fetch published posts (not drafts) - drafts are shown on /drafts page
   const { data: postsData, error: postsError } = await supabase
     .from('posts')
-    .select('*')
+    .select(POST_SELECT_WITH_QUOTE)
     .eq('user_id', profile.id)
     .eq('draft', false)
     .eq('hidden', false)
@@ -92,7 +93,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
     // Exclude posts authored by the profile user (those go in "Posts" tab, not "Tagged")
     const { data: mentionedPosts, error: mentionedError } = await supabase
       .from('posts')
-      .select('*')
+      .select(POST_SELECT_WITH_QUOTE)
       .neq('user_id', profile.id) // Don't include user's own posts
       .eq('draft', false)
       .eq('hidden', false)
@@ -120,7 +121,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   if (allTaggedPostIds.length > 0) {
     const { data: taggedPostsFull, error: taggedPostsFullError } = await supabase
       .from('posts')
-      .select('*')
+      .select(POST_SELECT_WITH_QUOTE)
       .in('id', allTaggedPostIds)
       .eq('draft', false)
       .eq('hidden', false)
@@ -143,7 +144,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
       }
 
       // Manually attach profiles to tagged posts
-      taggedPosts = taggedPostsFull.map(post => ({
+      const taggedPostsWithProfiles = taggedPostsFull.map(post => ({
         ...post,
         profiles: profilesData.find(p => p.id === post.user_id) || {
           id: post.user_id,
@@ -152,11 +153,12 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
           avatar_url: null
         }
       }))
+      taggedPosts = await attachQuotedPostProfiles(supabase, taggedPostsWithProfiles)
     }
   }
 
   // Manually attach profile to posts
-  const posts = postsData?.map(post => ({
+  const postsWithProfiles = postsData?.map(post => ({
     ...post,
     profiles: {
       id: profile.id,
@@ -165,6 +167,8 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
       avatar_url: profile.avatar_url
     }
   })) || []
+
+  const posts = await attachQuotedPostProfiles(supabase, postsWithProfiles)
 
   // Get follow status if logged in
   let isFollowing = false

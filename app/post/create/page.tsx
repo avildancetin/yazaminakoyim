@@ -1,23 +1,65 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Upload, X, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { processPostTags } from '@/app/api/tags/actions'
 import MentionTextarea from '@/components/MentionTextarea'
+import QuotedPostPreview, { QuotedPostData } from '@/components/QuotedPostPreview'
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
 
 export default function CreatePostPage() {
+  return (
+    <Suspense fallback={null}>
+      <CreatePostForm />
+    </Suspense>
+  )
+}
+
+function CreatePostForm() {
   const [content, setContent] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [quotedPost, setQuotedPost] = useState<QuotedPostData | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  useEffect(() => {
+    const quoteId = searchParams.get('quote')
+    if (!quoteId) return
+
+    supabase
+      .from('posts')
+      .select('id, content, media_url, media_type, created_at, user_id')
+      .eq('id', quoteId)
+      .eq('hidden', false)
+      .single()
+      .then(async ({ data, error: quoteError }) => {
+        if (quoteError || !data) return
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id, username, email, avatar_url')
+          .eq('id', data.user_id)
+          .single()
+
+        setQuotedPost({
+          ...data,
+          profiles: profile || {
+            id: data.user_id,
+            email: 'Unknown',
+            username: null,
+            avatar_url: null,
+          },
+        } as QuotedPostData)
+      })
+  }, [searchParams, supabase])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -69,8 +111,10 @@ export default function CreatePostPage() {
         throw new Error('You must be logged in to create a post')
       }
 
-      // Validate: If no media, content must be at least 30 characters (only when publishing, not for drafts)
-      if (!isDraft && !file && content.trim().length < 30) {
+      // Validate: If no media and not quoting another post, content must be at least
+      // 30 characters (only when publishing, not for drafts) -- a quoted post supplies
+      // its own substance, so empty commentary is allowed when quoting.
+      if (!isDraft && !file && !quotedPost && content.trim().length < 30) {
         setError('Posts without media must contain at least 30 characters')
         setLoading(false)
         return
@@ -112,6 +156,7 @@ export default function CreatePostPage() {
           media_type: mediaType,
           user_id: user.id,
           draft: isDraft,
+          quoted_post_id: quotedPost?.id || null,
         })
         .select()
         .single()
@@ -165,6 +210,21 @@ export default function CreatePostPage() {
         <div className="border border-white shadow-lg p-6" style={{ backgroundColor: '#c4d5df' }}>
           <h1 className="text-2xl font-bold mb-6 text-gray-900">Create New Post</h1>
           <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-6">
+            {quotedPost && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-900">Quoting</label>
+                  <button
+                    type="button"
+                    onClick={() => setQuotedPost(null)}
+                    className="text-xs text-gray-600 hover:text-gray-900 underline"
+                  >
+                    Remove quote
+                  </button>
+                </div>
+                <QuotedPostPreview post={quotedPost} />
+              </div>
+            )}
             <div>
               <label htmlFor="content" className="block text-sm font-medium mb-2 text-gray-900">
                 What's on your mind?
@@ -173,13 +233,17 @@ export default function CreatePostPage() {
                 id="content"
                 value={content}
                 onChange={setContent}
-                required={!file}
+                required={!file && !quotedPost}
                 rows={6}
                 className="w-full px-4 py-2 border border-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-gray-900"
                 style={{ backgroundColor: '#c4d5df' }}
-                placeholder={file ? "Share your thoughts... (optional)" : "Share your thoughts... (at least 30 characters if no media)"}
+                placeholder={
+                  file || quotedPost
+                    ? 'Share your thoughts... (optional)'
+                    : 'Share your thoughts... (at least 30 characters if no media)'
+                }
               />
-              {!file && (
+              {!file && !quotedPost && (
                 <p className="text-xs text-gray-600 mt-1">
                   {content.trim().length}/30 characters minimum
                 </p>

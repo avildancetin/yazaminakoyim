@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar'
 import PostCard from '@/components/PostCard'
 import CompactLogin from '@/components/CompactLogin'
 import SignupForm from '@/components/SignupForm'
+import { POST_SELECT_WITH_QUOTE, attachQuotedPostProfiles } from '@/utils/postSelect'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,7 +24,7 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
   // Get the post (fetch separately to avoid relationship issues)
   const { data: postData, error: postError } = await supabase
     .from('posts')
-    .select('*')
+    .select(POST_SELECT_WITH_QUOTE)
     .eq('id', resolvedParams.postId)
     .eq('hidden', false)
     .single()
@@ -40,7 +41,7 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
     .single()
 
   // Manually attach profile to post
-  const post = {
+  const postWithProfile = {
     ...postData,
     profiles: profileData || {
       id: postData.user_id,
@@ -49,6 +50,8 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
       avatar_url: null
     }
   }
+
+  const [post] = await attachQuotedPostProfiles(supabase, [postWithProfile])
 
   // Get follow status if logged in
   let isFollowing = false

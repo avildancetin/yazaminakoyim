@@ -5,7 +5,9 @@ import DraftActions from './DraftActions'
 import PostContent from './PostContent'
 import CopyPostLinkButton from './CopyPostLinkButton'
 import SharePostButton from './SharePostButton'
+import QuotedPostPreview, { QuotedPostData } from './QuotedPostPreview'
 import Link from 'next/link'
+import { Quote } from 'lucide-react'
 import { formatDateTime } from '@/utils/formatDateTime'
 
 interface Post {
@@ -15,6 +17,7 @@ interface Post {
   media_type: 'image' | 'video' | null
   created_at: string
   user_id: string
+  quoted_post?: QuotedPostData | null
   profiles: {
     id: string
     email: string
@@ -70,6 +73,14 @@ export default function PostCard({ post, currentUserId, isFollowing = false, sho
                 hasMedia={post.media_type === 'image' && !!post.media_url}
               />
               <CopyPostLinkButton postId={post.id} />
+              <Link
+                href={`/post/create?quote=${post.id}`}
+                className="p-1.5 hover:opacity-80 transition"
+                title="Quote post"
+                style={{ color: '#6b7280' }}
+              >
+                <Quote size={16} />
+              </Link>
             </>
           )}
           {isDraft && isOwnPost ? (
@@ -87,6 +98,7 @@ export default function PostCard({ post, currentUserId, isFollowing = false, sho
       </div>
       <div className="p-4 pt-3">
         <PostContent content={post.content} />
+        <QuotedPostPreview post={post.quoted_post} />
         {post.media_url && (
           <div className="overflow-hidden mb-3">
             {post.media_type === 'image' ? (

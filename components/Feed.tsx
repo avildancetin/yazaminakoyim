@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import PostCard from './PostCard'
+import { POST_SELECT_WITH_QUOTE, attachQuotedPostProfiles } from '@/utils/postSelect'
 
 export const dynamic = 'force-dynamic'
 
@@ -64,7 +65,7 @@ export default async function Feed({ searchParams }: FeedProps = {}) {
   // Build query
   let query = supabase
     .from('posts')
-    .select('*')
+    .select(POST_SELECT_WITH_QUOTE)
     .eq('draft', false)
     .eq('hidden', false)
 
@@ -154,15 +155,17 @@ export default async function Feed({ searchParams }: FeedProps = {}) {
   }
 
   // Join posts with profiles manually
-  const posts = postsData.map(post => ({
+  const postsWithProfiles = postsData.map(post => ({
     ...post,
-    profiles: profilesData.find(p => p.id === post.user_id) || { 
+    profiles: profilesData.find(p => p.id === post.user_id) || {
       id: post.user_id,
-      email: 'Unknown', 
+      email: 'Unknown',
       username: null,
       avatar_url: null
     }
   }))
+
+  const posts = await attachQuotedPostProfiles(supabase, postsWithProfiles)
 
   return (
     <div>

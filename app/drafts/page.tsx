@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Home as HomeIcon, UserPlus, Bell, User, FileText } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import PostCard from '@/components/PostCard'
+import { POST_SELECT_WITH_QUOTE, attachQuotedPostProfiles } from '@/utils/postSelect'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,7 +28,7 @@ export default async function DraftsPage() {
   // Get user's drafts (fetch separately to avoid relationship issues)
   const { data: draftsData, error: draftsError } = await supabase
     .from('posts')
-    .select('*')
+    .select(POST_SELECT_WITH_QUOTE)
     .eq('user_id', user.id)
     .eq('draft', true)
     .order('created_at', { ascending: false })
@@ -40,7 +41,7 @@ export default async function DraftsPage() {
     .single()
 
   // Manually attach profile to drafts
-  const drafts = draftsData?.map(draft => ({
+  const draftsWithProfiles = draftsData?.map(draft => ({
     ...draft,
     profiles: userProfile || {
       id: user.id,
@@ -49,6 +50,8 @@ export default async function DraftsPage() {
       avatar_url: null
     }
   })) || []
+
+  const drafts = await attachQuotedPostProfiles(supabase, draftsWithProfiles)
 
   // Get unread notification count
   const { count } = await supabase
