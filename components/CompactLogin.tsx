@@ -32,13 +32,13 @@ export default function CompactLogin() {
   }
 
   return (
-    <form action={handleSubmit} className="flex items-center gap-2">
+    <form action={handleSubmit} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <input
             name="email"
             type="text"
             placeholder="Email or Username"
             required
-            className="px-3 py-1.5 text-sm border border-black focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+            className="px-3 py-1.5 text-sm border border-black focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900 w-full sm:w-auto"
             style={{ backgroundColor: '#c4d5df' }}
           />
           <input
@@ -46,13 +46,13 @@ export default function CompactLogin() {
             type="password"
             placeholder="Password"
             required
-            className="px-3 py-1.5 text-sm border border-black focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900"
+            className="px-3 py-1.5 text-sm border border-black focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900 w-full sm:w-auto"
             style={{ backgroundColor: '#c4d5df' }}
           />
       <button
         type="submit"
         disabled={loading}
-        className="px-4 py-1.5 font-semibold disabled:bg-gray-400 text-white border border-black transition"
+        className="px-4 py-1.5 font-semibold disabled:bg-gray-400 text-white border border-black transition w-full sm:w-auto"
         style={{ backgroundColor: loading ? '#9ca3af' : '#894f69', fontSize: '18px' }}
         onMouseEnter={(e) => {
           if (!loading) e.currentTarget.style.backgroundColor = '#9a5f79'
@@ -64,7 +64,7 @@ export default function CompactLogin() {
         {loading ? '...' : 'Log In'}
       </button>
       {error && (
-        <span className="text-xs text-red-500 max-w-[150px] truncate" title={error}>
+        <span className="text-xs text-red-500 sm:max-w-[150px] truncate text-center" title={error}>
           {error}
         </span>
       )}

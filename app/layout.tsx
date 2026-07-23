@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import SuppressSourceMapErrors from '@/components/SuppressSourceMapErrors'
 
@@ -7,13 +7,17 @@ export const metadata: Metadata = {
   description: 'Private social feed for friends',
 }
 
+export const viewport: Viewport = {
+  colorScheme: 'light',
+}
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body className="text-gray-900 font-sans" style={{ 
         fontFamily: "'VT323', Arial, sans-serif", 
         fontSize: '14px', 

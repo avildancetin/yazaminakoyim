@@ -26,19 +26,19 @@ export default function Navbar() {
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <form onSubmit={handleSearch} className="flex items-stretch">
+    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto">
+      <form onSubmit={handleSearch} className="flex items-stretch w-full sm:w-auto">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search users or posts..."
-          className="px-3 py-1.5 border border-black bg-white text-gray-900 focus:outline-none focus:ring-0"
+          className="px-3 py-1.5 border border-black bg-white text-gray-900 focus:outline-none focus:ring-0 flex-1 sm:flex-initial min-w-0"
           style={{ fontSize: '15px', width: '200px' }}
         />
         <button
           type="submit"
-          className="flex items-center justify-center px-2 py-1.5 text-white font-medium border border-black border-l-0 transition"
+          className="flex items-center justify-center px-2 py-1.5 text-white font-medium border border-black border-l-0 transition shrink-0"
           style={{ backgroundColor: '#894f69', fontSize: '15px' }}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#9a5f79'}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#894f69'}
@@ -54,7 +54,7 @@ export default function Navbar() {
         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#894f69'}
       >
         <Plus size={16} />
-        New Post
+        <span className="hidden sm:inline">New Post</span>
       </Link>
       <Link
         href="/profile/edit"
@@ -62,7 +62,7 @@ export default function Navbar() {
         style={{ fontSize: '18px' }}
       >
         <User size={16} />
-        Edit Profile
+        <span className="hidden sm:inline">Edit Profile</span>
       </Link>
       <button
         onClick={handleLogout}
@@ -70,7 +70,7 @@ export default function Navbar() {
         style={{ fontSize: '18px' }}
       >
         <LogOut size={16} />
-        Logout
+        <span className="hidden sm:inline">Logout</span>
       </button>
     </div>
   )

@@ -82,13 +82,20 @@ export default async function Home({
         <UpdateLastSeen />
         {/* Header */}
         <header className="border-b border-black sticky top-0 z-50" style={{ backgroundColor: '#c4d5df' }}>
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <Link href="/" className="text-4xl font-bold" style={{ color: '#894f69', fontSize: '54px' }}>
+          <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3 flex items-center justify-center sm:justify-between">
+            <Link href="/" className="text-4xl font-bold" style={{ color: '#894f69', fontSize: 'clamp(28px, 8vw, 54px)' }}>
               yazamınakoyim
             </Link>
-            <Navbar />
+            <div className="hidden sm:block">
+              <Navbar />
+            </div>
           </div>
         </header>
+        <div className="border-b border-black sm:hidden" style={{ backgroundColor: '#c4d5df' }}>
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <Navbar />
+          </div>
+        </div>
 
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -170,17 +177,24 @@ export default async function Home({
     <main className="min-h-screen">
       {/* Header with Login */}
       <header className="border-b border-black sticky top-0 z-50" style={{ backgroundColor: '#c4d5df' }}>
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-4xl font-bold" style={{ color: '#894f69', fontSize: '54px' }}>yazamınakoyim</h1>
-          <CompactLogin />
+        <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3 flex items-center justify-center sm:justify-between">
+          <h1 className="text-4xl font-bold" style={{ color: '#894f69', fontSize: 'clamp(28px, 8vw, 54px)' }}>yazamınakoyim</h1>
+          <div className="hidden sm:block">
+            <CompactLogin />
+          </div>
         </div>
       </header>
+      <div className="border-b border-black sm:hidden" style={{ backgroundColor: '#c4d5df' }}>
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <CompactLogin />
+        </div>
+      </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Side - Feed (2 columns on large screens) */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-2 lg:order-1">
             <Suspense fallback={<div className="mb-6 border border-black p-4" style={{ backgroundColor: '#c4d5df' }}>Loading sort options...</div>}>
               <FeedSort />
             </Suspense>
@@ -189,8 +203,8 @@ export default async function Home({
             </Suspense>
           </div>
 
-          {/* Right Side - Signup Form (1 column on large screens) */}
-          <div className="lg:col-span-1">
+          {/* Right Side - Signup Form (1 column on large screens), shown first on mobile so it's not buried below the feed */}
+          <div className="lg:col-span-1 order-1 lg:order-2">
             <SignupForm />
           </div>
         </div>
