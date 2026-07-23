@@ -30,4 +30,37 @@ export async function checkUsernamesExist(usernames: string[]): Promise<Set<stri
   return new Set((profiles || []).map(p => p.username?.toLowerCase()).filter(Boolean))
 }
 
+export interface UsernameSuggestion {
+  id: string
+  username: string
+  avatar_url: string | null
+}
+
+/**
+ * Search usernames by prefix, for @mention autocomplete
+ */
+export async function searchUsernames(query: string, limit = 6): Promise<UsernameSuggestion[]> {
+  const trimmed = query.trim()
+  if (!trimmed) {
+    return []
+  }
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, avatar_url')
+    .not('username', 'is', null)
+    .ilike('username', `${trimmed}%`)
+    .order('username', { ascending: true })
+    .limit(limit)
+
+  if (error) {
+    console.error('Error searching usernames:', error)
+    return []
+  }
+
+  return (data || []) as UsernameSuggestion[]
+}
+
 

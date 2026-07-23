@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Upload, X, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { processPostTags } from '@/app/api/tags/actions'
+import MentionTextarea from '@/components/MentionTextarea'
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
 
@@ -168,10 +169,10 @@ export default function CreatePostPage() {
               <label htmlFor="content" className="block text-sm font-medium mb-2 text-gray-900">
                 What's on your mind?
               </label>
-              <textarea
+              <MentionTextarea
                 id="content"
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                onChange={setContent}
                 required={!file}
                 rows={6}
                 className="w-full px-4 py-2 border border-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-gray-900"

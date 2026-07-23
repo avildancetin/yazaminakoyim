@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createCommentAction } from '@/app/api/comments/actions'
+import MentionTextarea from './MentionTextarea'
 
 interface CommentFormProps {
   postId: string
@@ -50,9 +51,9 @@ export default function CommentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
-      <textarea
+      <MentionTextarea
         value={content}
-        onChange={(e) => setContent(e.target.value)}
+        onChange={setContent}
         placeholder={placeholder}
         required
         rows={2}
